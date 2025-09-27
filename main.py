@@ -5,6 +5,7 @@ from fastapi import FastAPI
 from dotenv import load_dotenv
 from typing import List, Dict
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import HTMLResponse
 
 
 app = FastAPI()
@@ -12,6 +13,7 @@ app = FastAPI()
 origins = [
     "http://localhost:5500",  # tu frontend
     "http://127.0.0.1:5500",  # por si usas esta variante
+    "http://3.19.242.144:5500"  # IP pública del servidor
 ]
 
 app.add_middleware(
@@ -35,3 +37,17 @@ async def chat_endpoint(payload: ChatHistory):
 async def json_endpoint(payload: ChatHistory):
     reply = structurize(payload.history)
     return reply
+
+
+
+
+@app.post("/chat")
+async def agent_chat(payload: ChatHistory):
+    reply = structurize(payload.history)
+    return reply
+
+@app.get("/", response_class=HTMLResponse)
+async def root():
+    with open("index.html", "r", encoding="utf-8") as f:
+        html_content = f.read()
+    return HTMLResponse(content=html_content, status_code=200)
