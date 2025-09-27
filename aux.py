@@ -78,6 +78,7 @@ def explain_predictions(preds: dict, llm) -> str:
     return llm(prompt).strip()
 
 # ========== Endpoint: /predict ==========
+
 @router.post("/predict")
 async def predict(data: ClinicalStructure):
     try:
@@ -93,12 +94,7 @@ async def predict(data: ClinicalStructure):
         preds_clean = postprocess_predictions(preds, azure_llm)
         explanation = explain_predictions(preds_clean, azure_llm)
 
-        return {
-            "narrativa_es": narrativa_es,
-            "narrativa_en": narrativa_en,
-            "predicciones": preds_clean["predictions"],
-            "explicacion": explanation
-        }
+        return {"explicacion": explanation}
 
     except Exception as e:
         return {"error": str(e)}
