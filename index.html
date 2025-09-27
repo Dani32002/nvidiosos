@@ -54,7 +54,7 @@
     const API_URL_START = 'http://3.19.242.144:8000/start';
     const API_URL_JSON = 'http://3.19.242.144:8000/json';
     const API_URL_AGENT = 'http://3.19.242.144:8000/chat';
-    const API_URL_DIAGNOSTIC = 'http://127.0.0.1:8000/diagnostic';
+    const API_URL_DIAGNOSTIC = 'http://3.19.242.144:8000/predict';
 
     // Configura tu endpoint externo aquí
     let API_KEY = ''; // opcional
@@ -170,7 +170,6 @@
 
     function handleEnd() {
         getJSON();
-        API_URL = API_URL_AGENT;
     }
 
     // Función que envía la consulta a la API externa
@@ -245,16 +244,13 @@
 
     function handleDeny() {
         pushMessage('assistant', 'Lamentamos que no pueda continuar. Recuerde que este chatassistant no sustituye una consulta médica presencial. Si presenta síntomas graves, urgentes o que empeoran, acuda inmediatamente a un centro médico o llame a los servicios de emergencia locales. Reiniciando en 10 segundos...');
-        const inputArea = document.getElementById('inputMsg');
-        inputArea.style.backgroundColor = '#f0f0f0';
-        inputArea.disabled = true;
-        setTimeout(() => {
-            window.location.reload();
-        }, 10000);
         accept.disabled = true;
         accept.style.backgroundColor = '#f0f0f0';
         deny.disabled = true;
         deny.style.backgroundColor = '#f0f0f0';
+        setTimeout(() => {
+            window.location.reload();
+        }, 10000);
     }
 
     function handleAccept() {
@@ -263,6 +259,8 @@
         accept.style.backgroundColor = '#f0f0f0';
         deny.disabled = true;
         deny.style.backgroundColor = '#f0f0f0';
+        $input.style.backgroundColor = 'white';
+        $input.disabled = false;
     }
 
     deny.addEventListener('click', handleDeny);
@@ -273,6 +271,9 @@
 
     // Mensaje inicial de bienvenida con tono médico
     pushMessage('assistant', 'Este chatbot ofrece información de carácter orientativo basada en los datos que usted proporcione. No es un profesional de la salud, no establece diagnósticos, ni prescribe tratamientos. La información entregada puede contener errores u omisiones y no sustituye la evaluación de un médico, especialista u otro profesional de la salud calificado. Al continuar, usted reconoce y acepta que: Responsabilidad: La decisión de utilizar la información proporcionada es exclusivamente suya. Limitaciones: La herramienta puede presentar imprecisiones o fallos técnicos. Privacidad: Los datos ingresados serán tratados solo para generar la respuesta y no se consideran historia clínica oficial. Si presenta síntomas graves, urgentes o que empeoran, acuda inmediatamente a un centro médico o llame a los servicios de emergencia locales. Al hacer clic en “Aceptar” o iniciar la conversación, confirma que ha leído y comprendido este consentimiento.', button_container);
+    
+    $input.style.backgroundColor = '#f0f0f0';
+    $input.disabled = true;
 
     // Exponer funciones útiles en window para debugging (opcional)
     window.chatHistory = history;

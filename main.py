@@ -1,5 +1,6 @@
 from get_information import get_medical_reply
 from structure_information import structurize
+from follow_up import follow_up
 from pydantic import BaseModel
 from fastapi import FastAPI
 from dotenv import load_dotenv
@@ -33,6 +34,10 @@ async def chat_endpoint(payload: ChatHistory):
     reply = get_medical_reply(payload.history)
     return reply
 
+@app.post("/chat")
+async def follow_up(payload: ChatHistory):
+    reply = follow_up(payload.history)
+    return reply
 
 @app.post("/json")
 async def json_endpoint(payload: ChatHistory):
