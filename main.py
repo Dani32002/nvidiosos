@@ -35,7 +35,7 @@ async def chat_endpoint(payload: ChatHistory):
     return reply
 
 @app.post("/chat")
-async def follow_up(payload: ChatHistory):
+async def generate_follow_up_response(payload: ChatHistory):
     reply = follow_up(payload.history)
     return reply
 
