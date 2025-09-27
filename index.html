@@ -219,7 +219,7 @@
       const userMsg = pushMessage('user', text);
 
       // Mensaje provisional del assistant (tono médico) para mostrar que se procesa
-      pushMessage('assistant', 'Procesando su consulta con tono clínico. Un momento por favor...');
+      pushMessage('assistant', 'Procesando su consulta. Un momento por favor...');
 
       // Llamamos a la API con el mensaje del usuario (y el historial)
       await sendToApi(userMsg);
@@ -230,13 +230,13 @@
     button_container.style.width = '100%';
     const accept = document.createElement('button')
     accept.textContent = "Aceptar"
-    accept.style.backgroundColor = 'white';
-    accept.style.color = 'Black';
+    accept.style.backgroundColor = 'green';
+    accept.style.color = 'white';
     button_container.appendChild(accept);
     const deny = document.createElement('button');
     deny.textContent = "Denegar"
-    deny.style.backgroundColor = 'white';
-    deny.style.color = 'Black';
+    deny.style.backgroundColor = 'red';
+    deny.style.color = 'white';
     button_container.appendChild(deny);
     button_container.style.display = 'flex';
     button_container.style.justifyContent = 'space-evenly';
