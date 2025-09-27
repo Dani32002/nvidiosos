@@ -6,4 +6,5 @@ uvicorn
 langchain
 transformers
 torch
-numpy<2.0
+numpy<2.0   
+

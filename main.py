@@ -1,7 +1,7 @@
 from get_information import get_medical_reply
 from structure_information import structurize
-from follow_up import follow_up
 from pydantic import BaseModel
+from follow_up import follow_up
 from fastapi import FastAPI
 from dotenv import load_dotenv
 from typing import List, Dict
@@ -44,18 +44,15 @@ async def json_endpoint(payload: ChatHistory):
     reply = structurize(payload.history)
     return reply
 
-class SymptomInput(BaseModel):
-    symptoms: str
 
-@app.post("/predict")
-async def predict_endpoint(payload: SymptomInput):
-    try:
-        return predict(payload.symptoms)
-    except Exception as e:
-        return {"error": str(e)}
     
 @app.get("/", response_class=HTMLResponse)
 async def read_root():
     with open("index.html", "r") as file:
         html_content = file.read()
     return HTMLResponse(content=html_content, status_code=200)
+
+from aux import router as aux_router
+app.include_router(aux_router)
+
+    
