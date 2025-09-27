@@ -53,3 +53,9 @@ async def predict_endpoint(payload: SymptomInput):
         return predict(payload.symptoms)
     except Exception as e:
         return {"error": str(e)}
+    
+@app.get("/", response_class=HTMLResponse)
+async def read_root():
+    with open("index.html", "r") as file:
+        html_content = file.read()
+    return HTMLResponse(content=html_content, status_code=200)
