@@ -51,10 +51,10 @@
 
     let JSON_STRUC = '';
 
-    const API_URL_START = 'http://3.19.242.144:8000/start';
-    const API_URL_JSON = 'http://3.19.242.144:8000/json';
-    const API_URL_AGENT = 'http://3.19.242.144:8000/chat';
-    const API_URL_DIAGNOSTIC = 'http://3.19.242.144:8000/predict';
+    const API_URL_START = 'http://18.222.229.140:8000/start';
+    const API_URL_JSON = 'http://18.222.229.140:8000/json';
+    const API_URL_AGENT = 'http://18.222.229.140:8000/chat';
+    const API_URL_DIAGNOSTIC = 'http://18.222.229.140:8000/predict';
 
     // Configura tu endpoint externo aquí
     let API_KEY = ''; // opcional
@@ -271,7 +271,7 @@
 
     // Mensaje inicial de bienvenida con tono médico
     pushMessage('assistant', 'Este asistente virtual tiene como propósito guiar una anamnesis básica de forma orientativa y educativa. No reemplaza la atención médica profesional, ni establece diagnósticos o tratamientos. La interacción se limita a la recopilación de síntomas y antecedentes con fines demostrativos y probabilísticos. Los datos que usted ingrese se usarán únicamente dentro de esta sesión (por ejemplo, en el contexto de la hackathon) y no constituyen historia clínica oficial. Responsabilidad: El uso de la información generada es decisión exclusiva del usuario. Limitaciones: La herramienta puede presentar imprecisiones o fallos técnicos. Privacidad: Los datos se emplean solo para esta conversación y no se almacenan de forma permanente. Si presenta síntomas graves, urgentes o que empeoran, acuda inmediatamente a un centro médico o comuníquese con los servicios de emergencia. Al hacer clic en “Aceptar” o iniciar la conversación, confirma que ha leído y comprendido este consentimiento.', button_container);
-    
+
     $input.style.backgroundColor = '#f0f0f0';
     $input.disabled = true;
 
