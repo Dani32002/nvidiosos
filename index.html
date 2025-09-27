@@ -1,0 +1,248 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Chatbot Médico - Front</title>
+  <style>
+    :root{--bg:#f5f7fb;--card:#ffffff;--accent:#0b63d6;--muted:#6b7280}
+    body{font-family:Inter, system-ui, Arial, sans-serif;background:var(--bg);margin:0;padding:24px;display:flex;align-items:center;justify-content:center;height:100vh}
+    .container{width:420px;background:var(--card);border-radius:12px;box-shadow:0 6px 20px rgba(10,20,40,.08);overflow:hidden}
+    header{padding:16px 20px;border-bottom:1px solid #eef2f6}
+    header h1{margin:0;font-size:16px}
+    .chat{height:520px;display:flex;flex-direction:column}
+    .messages{flex:1;padding:16px;overflow:auto;background:linear-gradient(180deg,#fbfdff,transparent)}
+    .msg{max-width:78%;margin-bottom:12px;padding:10px 12px;border-radius:10px;line-height:1.35}
+    .msg.user{margin-left:auto;background:#e6f0ff;color:#022a66}
+    .msg.bot{margin-right:auto;background:#0b63d6;color:#fff;border-radius:10px}
+    .meta{font-size:12px;color:var(--muted);margin-bottom:6px}
+    .composer{display:flex;padding:12px;border-top:1px solid #eef2f6}
+    .composer input{flex:1;padding:10px;border-radius:8px;border:1px solid #d1d7df;margin-right:8px}
+    .composer button{background:var(--accent);color:#fff;padding:10px 12px;border-radius:8px;border:none;cursor:pointer}
+    .small{font-size:12px;color:var(--muted);padding:8px 16px}
+    .pill{display:inline-block;padding:4px 8px;border-radius:999px;background:#eef6ff;color:#0b63d6;font-weight:600;font-size:12px}
+  </style>
+</head>
+<body>
+  <div class="container" role="application" aria-label="Chatbot médico">
+    <header>
+      <div style="display:flex;align-items:center;gap:10px">
+        <div class="pill">Consultorio</div>
+        <div style="flex:1">
+          <h1>Asistente Médico — Historia Clínica</h1>
+          <div class="small">Consejos y orientación con tono médico. No sustituye una consulta presencial.</div>
+        </div>
+      </div>
+    </header>
+
+    <main class="chat">
+      <div class="messages" id="messages" aria-live="polite"></div>
+
+      <div class="composer">
+        <input id="inputMsg" type="text" placeholder="Describe tus síntomas o pregunta..." autocomplete="off" />
+        <button id="sendBtn">Enviar</button>
+      </div>
+    </main>
+  </div>
+
+  <script>
+    // Historial de mensajes (se puede persistir en localStorage si se desea)
+    const history = [];
+
+    const JSON_STRUC = '';
+
+    const API_URL_START = 'https://j09eftqmn8.execute-api.us-west-2.amazonaws.com/dev';
+    const API_URL_JSON = '';
+    const API_URL_AGENT = '';
+
+    // Configura tu endpoint externo aquí
+    const API_URL = API_URL_START; // <- reemplaza por tu API
+    const API_KEY = ''; // opcional
+
+    const $messages = document.getElementById('messages');
+    const $input = document.getElementById('inputMsg');
+    const $send = document.getElementById('sendBtn');
+
+    function renderMessages() {
+      $messages.innerHTML = '';
+      for (const m of history) {
+        if (m.show) {
+            const el = document.createElement('div');
+            el.className = 'msg ' + (m.role === 'user' ? 'user' : 'assistant');
+            if (m.role === 'assistant') {
+            const meta = document.createElement('div');
+            meta.className = 'meta';
+            meta.textContent = `Dr. Asistente • ${new Date(m.timestamp).toLocaleString()}`;
+            el.appendChild(meta);
+            }
+            const text = document.createElement('div');
+            text.textContent = m.content;
+            el.appendChild(text);
+            console.log(m.extraHTML);
+            if (m.extraHTML) {
+                el.appendChild(m.extraHTML);
+            }
+            $messages.appendChild(el);
+        }
+      }
+      $messages.scrollTop = $messages.scrollHeight;
+    }
+
+    // Añade un mensaje al historial y renderiza
+    function pushMessage(role, content, extraHTML=null, show=true) {
+      const msg = { role, content, timestamp: Date.now(), extraHTML, show };
+      history.push(msg);
+      renderMessages();
+      return msg;
+    }
+
+    async function getJSON() {
+      // Construimos la carga que se enviará: podemos enviar todo el historial si la API lo requiere
+      const payload = {
+        // En muchas APIs de chat se envía el historial tal cual. Ajusta según tu API.
+        history: history.map(h => ({role: h.role, content: h.content, timestamp: h.timestamp})),
+      };
+
+      try {
+        const res = await fetch(API_URL_JSON, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(payload)
+        });
+
+        //TODO
+        if (!res.ok) {
+          const text = await res.text();
+          console.error('API error', res.status, text);
+          pushMessage('assistant', 'Lo siento, hubo un problema al procesar la solicitud. Por favor inténtelo de nuevo más tarde.');
+          return;
+        }
+
+
+        const data = await res.json();
+        // Asumimos que la API responde con { reply: 'texto' } o similar. Ajusta a tu respuesta real.
+        JSON_STRUC = data.reply || (data.message && data.message.content) || 'No se obtuvo respuesta.';
+        pushMessage('assistant', JOSN.stringify(JSON_STRUC), show);
+      } catch (err) {
+        console.error('Fetch error', err);
+      }
+    }
+
+    
+
+    function handleEnd() {
+        getJSON();
+        API_URL = API_URL_AGENT;
+    }
+
+    // Función que envía la consulta a la API externa
+    async function sendToApi(userMessage) {
+      // Construimos la carga que se enviará: podemos enviar todo el historial si la API lo requiere
+      const payload = {
+        // En muchas APIs de chat se envía el historial tal cual. Ajusta según tu API.
+        history: history.map(h => ({role: h.role, content: h.content})),
+      };
+
+      try {
+        const res = await fetch(API_URL, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Access-Control-Allow-Origin': '*',
+            'Access-Control-Allow-Headers': 'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token'
+          },
+          body: JSON.stringify(payload)
+        });
+
+        if (!res.ok) {
+          const text = await res.text();
+          console.error('API error', res.status, text);
+          pushMessage('assistant', 'Lo siento, hubo un problema al procesar la solicitud. Por favor inténtelo de nuevo más tarde.');
+          return;
+        }
+
+        const data = await res.json();
+        // Asumimos que la API responde con { reply: 'texto' } o similar. Ajusta a tu respuesta real.
+        const replyText = data.body;
+        if (replyText.includes('END')) {
+            handleEnd();
+        }
+        pushMessage('assistant', replyText);
+      } catch (err) {
+        console.error('Fetch error', err);
+        pushMessage('assistant', 'No fue posible conectar con el servicio externo. Verifique su conexión o la configuración del servidor.');
+      }
+    }
+
+    // Manejo del envío desde el UI
+    async function handleSend() {
+      const text = $input.value.trim();
+      if (!text) return;
+      $input.value = '';
+
+      // Mensaje del usuario se añade al historial
+      const userMsg = pushMessage('user', text);
+
+      // Mensaje provisional del assistant (tono médico) para mostrar que se procesa
+      pushMessage('assistant', 'Procesando su consulta con tono clínico. Un momento por favor...');
+
+      // Llamamos a la API con el mensaje del usuario (y el historial)
+      await sendToApi(userMsg);
+    }
+
+    const button_container = document.createElement('div');
+    button_container.className = 'composer';
+    button_container.style.width = '100%';
+    const accept = document.createElement('button')
+    accept.textContent = "Aceptar"
+    accept.style.backgroundColor = 'white';
+    accept.style.color = 'Black';
+    button_container.appendChild(accept);
+    const deny = document.createElement('button');
+    deny.textContent = "Denegar"
+    deny.style.backgroundColor = 'white';
+    deny.style.color = 'Black';
+    button_container.appendChild(deny);
+    button_container.style.display = 'flex';
+    button_container.style.justifyContent = 'space-evenly';
+
+
+    function handleDeny() {
+        pushMessage('assistant', 'Lamentamos que no pueda continuar. Recuerde que este chatassistant no sustituye una consulta médica presencial. Si presenta síntomas graves, urgentes o que empeoran, acuda inmediatamente a un centro médico o llame a los servicios de emergencia locales. Reiniciando en 10 segundos...');
+        const inputArea = document.getElementById('inputMsg');
+        inputArea.style.backgroundColor = '#f0f0f0';
+        inputArea.disabled = true;
+        setTimeout(() => {
+            window.location.reload();
+        }, 10000);
+        accept.disabled = true;
+        accept.style.backgroundColor = '#f0f0f0';
+        deny.disabled = true;
+        deny.style.backgroundColor = '#f0f0f0';
+    }
+
+    function handleAccept() {
+        pushMessage('assistant', 'Gracias por aceptar. Por favor, describa sus síntomas o haga su pregunta.');
+        accept.disabled = true;
+        accept.style.backgroundColor = '#f0f0f0';
+        deny.disabled = true;
+        deny.style.backgroundColor = '#f0f0f0';
+    }
+
+    deny.addEventListener('click', handleDeny);
+    accept.addEventListener('click', handleAccept);
+
+    $send.addEventListener('click', handleSend);
+    $input.addEventListener('keypress', function(e){ if (e.key === 'Enter') handleSend(); });
+
+    // Mensaje inicial de bienvenida con tono médico
+    pushMessage('assistant', 'Este chatbot ofrece información de carácter orientativo basada en los datos que usted proporcione. No es un profesional de la salud, no establece diagnósticos, ni prescribe tratamientos. La información entregada puede contener errores u omisiones y no sustituye la evaluación de un médico, especialista u otro profesional de la salud calificado. Al continuar, usted reconoce y acepta que: Responsabilidad: La decisión de utilizar la información proporcionada es exclusivamente suya. Limitaciones: La herramienta puede presentar imprecisiones o fallos técnicos. Privacidad: Los datos ingresados serán tratados solo para generar la respuesta y no se consideran historia clínica oficial. Si presenta síntomas graves, urgentes o que empeoran, acuda inmediatamente a un centro médico o llame a los servicios de emergencia locales. Al hacer clic en “Aceptar” o iniciar la conversación, confirma que ha leído y comprendido este consentimiento.', button_container);
+
+    // Exponer funciones útiles en window para debugging (opcional)
+    window.chatHistory = history;
+    window.pushMessage = pushMessage;
+  </script>
+</body>
+</html>
