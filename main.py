@@ -38,3 +38,13 @@ async def chat_endpoint(payload: ChatHistory):
 async def json_endpoint(payload: ChatHistory):
     reply = structurize(payload.history)
     return reply
+
+class SymptomInput(BaseModel):
+    symptoms: str
+
+@app.post("/predict")
+async def predict_endpoint(payload: SymptomInput):
+    try:
+        return predict(payload.symptoms)
+    except Exception as e:
+        return {"error": str(e)}
