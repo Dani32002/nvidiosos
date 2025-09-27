@@ -51,9 +51,10 @@
 
     let JSON_STRUC = '';
 
-    const API_URL_START = 'http://127.0.0.1:8000/start';
-    const API_URL_JSON = 'http://127.0.0.1:8000/json';
-    const API_URL_AGENT = '';
+    const API_URL_START = 'http://3.19.242.144:8000/start';
+    const API_URL_JSON = 'http://3.19.242.144:8000/json';
+    const API_URL_AGENT = 'http://3.19.242.144:8000/chat';
+    const API_URL_DIAGNOSTIC = 'http://127.0.0.1:8000/diagnostic';
 
     // Configura tu endpoint externo aquí
     let API_KEY = ''; // opcional
@@ -98,6 +99,38 @@
       return msg;
     }
 
+    async function getDiagnostic(json_struc) {
+        const payload = json_struc;
+
+      try {
+        const res = await fetch(API_URL_DIAGNOSTIC, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(payload)
+        });
+        console.log(res)
+        //TODO
+        if (!res.ok) {
+          const text = await res.text();
+          console.error('API error', res.status, text);
+          pushMessage('assistant', 'Lo siento, hubo un problema al procesar la solicitud. Por favor inténtelo de nuevo más tarde.');
+          return;
+        }
+
+
+        const data = await res.json();
+        // Asumimos que la API responde con { reply: 'texto' } o similar. Ajusta a tu respuesta real.
+        const replyText = data;
+        pushMessage('assistant', replyText);
+        API_URL = API_URL_AGENT;
+      } catch (err) {
+        console.error('Fetch error', err);
+        pushMessage('assistant', 'No fue posible conectar con el servicio externo. Verifique su conexión o la configuración del servidor.');
+      }
+    }
+
     async function getJSON() {
       // Construimos la carga que se enviará: podemos enviar todo el historial si la API lo requiere
       const payload = {
@@ -127,6 +160,7 @@
         // Asumimos que la API responde con { reply: 'texto' } o similar. Ajusta a tu respuesta real.
         JSON_STRUC = data;
         console.log(JSON_STRUC);
+        getDiagnostic(JSON_STRUC);
       } catch (err) {
         console.error('Fetch error', err);
       }

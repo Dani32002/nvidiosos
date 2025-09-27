@@ -6,6 +6,7 @@ from dotenv import load_dotenv
 from typing import List, Dict
 from fastapi.middleware.cors import CORSMiddleware
 from predict_diagnosis import predict
+from fastapi.responses import HTMLResponse
 
 
 app = FastAPI()
@@ -13,6 +14,7 @@ app = FastAPI()
 origins = [
     "http://localhost:5500",  # tu frontend
     "http://127.0.0.1:5500",  # por si usas esta variante
+    "http://3.19.242.144:5500"  # IP pública del servidor
 ]
 
 app.add_middleware(
@@ -36,14 +38,3 @@ async def chat_endpoint(payload: ChatHistory):
 async def json_endpoint(payload: ChatHistory):
     reply = structurize(payload.history)
     return reply
-
-
-class SymptomInput(BaseModel):
-    symptoms: str
-
-@app.post("/predict")
-async def predict_endpoint(payload: SymptomInput):
-    try:
-        return predict(payload.symptoms)
-    except Exception as e:
-        return {"error": str(e)}
