@@ -97,7 +97,7 @@ async def predict(data: ClinicalStructure):
         preds_clean = postprocess_predictions(preds, azure_llm)
         explanation = explain_predictions(preds_clean, azure_llm)
 
-        return {"explicacion": explanation}
+        return explanation
 
     except Exception as e:
         return {"error": str(e)}
