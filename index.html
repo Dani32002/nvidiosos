@@ -49,15 +49,15 @@
     // Historial de mensajes (se puede persistir en localStorage si se desea)
     const history = [];
 
-    const JSON_STRUC = '';
+    let JSON_STRUC = '';
 
-    const API_URL_START = 'https://j09eftqmn8.execute-api.us-west-2.amazonaws.com/dev';
-    const API_URL_JSON = '';
+    const API_URL_START = 'http://127.0.0.1:8000/start';
+    const API_URL_JSON = 'http://127.0.0.1:8000/json';
     const API_URL_AGENT = '';
 
     // Configura tu endpoint externo aquí
-    const API_URL = API_URL_START; // <- reemplaza por tu API
-    const API_KEY = ''; // opcional
+    let API_KEY = ''; // opcional
+    let API_URL = API_URL_START;
 
     const $messages = document.getElementById('messages');
     const $input = document.getElementById('inputMsg');
@@ -66,6 +66,9 @@
     function renderMessages() {
       $messages.innerHTML = '';
       for (const m of history) {
+         if (m.content.includes("END")) {
+          continue;
+        }
         if (m.show) {
             const el = document.createElement('div');
             el.className = 'msg ' + (m.role === 'user' ? 'user' : 'assistant');
@@ -78,7 +81,6 @@
             const text = document.createElement('div');
             text.textContent = m.content;
             el.appendChild(text);
-            console.log(m.extraHTML);
             if (m.extraHTML) {
                 el.appendChild(m.extraHTML);
             }
@@ -100,7 +102,7 @@
       // Construimos la carga que se enviará: podemos enviar todo el historial si la API lo requiere
       const payload = {
         // En muchas APIs de chat se envía el historial tal cual. Ajusta según tu API.
-        history: history.map(h => ({role: h.role, content: h.content, timestamp: h.timestamp})),
+        history: history.map(h => ({role: h.role, content: h.content})),
       };
 
       try {
@@ -111,7 +113,7 @@
           },
           body: JSON.stringify(payload)
         });
-
+        console.log(res)
         //TODO
         if (!res.ok) {
           const text = await res.text();
@@ -123,8 +125,8 @@
 
         const data = await res.json();
         // Asumimos que la API responde con { reply: 'texto' } o similar. Ajusta a tu respuesta real.
-        JSON_STRUC = data.reply || (data.message && data.message.content) || 'No se obtuvo respuesta.';
-        pushMessage('assistant', JOSN.stringify(JSON_STRUC), show);
+        JSON_STRUC = data;
+        console.log(JSON_STRUC);
       } catch (err) {
         console.error('Fetch error', err);
       }
@@ -149,9 +151,7 @@
         const res = await fetch(API_URL, {
           method: 'POST',
           headers: {
-            'Content-Type': 'application/json',
-            'Access-Control-Allow-Origin': '*',
-            'Access-Control-Allow-Headers': 'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token'
+            'Content-Type': 'application/json'
           },
           body: JSON.stringify(payload)
         });
@@ -165,7 +165,7 @@
 
         const data = await res.json();
         // Asumimos que la API responde con { reply: 'texto' } o similar. Ajusta a tu respuesta real.
-        const replyText = data.body;
+        const replyText = data;
         if (replyText.includes('END')) {
             handleEnd();
         }
