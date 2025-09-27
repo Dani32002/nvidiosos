@@ -14,6 +14,27 @@ NVIDIOSOS es un sistema de inteligencia artificial avanzado diseñado para reali
 - **📈 Seguimiento Inteligente**: Sistema de historial y seguimiento de conversaciones médicas
 
 
+## Json - Datos estructurados ejemplo:
+```json
+{
+  "motivo_consulta": "dolor faríngeo",
+  "enfermedad_actual": {
+    "sintoma_principal": "dolor faríngeo",
+    "inicio": "anoche",
+    "caracteristicas": "dolor al hablar; dolor moderado (escala 5/10); ronquera leve; sin fiebre; sin disfagia; sin otros síntomas asociados"
+  },
+  "antecedentes_personales": [],
+  "antecedentes_familiares": [],
+  "habitos": {
+    "tabaquismo": "no fumador",
+    "alcohol": "sin consumo de alcohol"
+  },
+  "sintomas_asociados": [
+    "disfonía leve"
+  ]
+}
+```
+
 
 ## 🏗️ Arquitectura del Sistema
 
