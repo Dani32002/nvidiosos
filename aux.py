@@ -19,13 +19,16 @@ DEPLOYMENT_NAME = "gpt-5-nano-iau-ingenieria"
 router = APIRouter()
 
 # ========== Modelos de entrada ==========
+from typing import Union, List, Dict
+
 class ClinicalStructure(BaseModel):
     motivo_consulta: str
-    enfermedad_actual: Dict[str, str]
-    antecedentes_personales: List[str]
-    antecedentes_familiares: List[str]
-    habitos: Dict[str, str]
-    sintomas_asociados: List[str]
+    enfermedad_actual: Union[Dict[str, str], str]
+    antecedentes_personales: Union[List[str], str]
+    antecedentes_familiares: Union[List[str], str]
+    habitos: Union[Dict[str, str], str]
+    sintomas_asociados: Union[List[str], str]
+
 
 # ========== Funciones LLM / flujo completo ==========
 def azure_llm(prompt: str) -> str:
